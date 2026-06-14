@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Completed_Showings</fullName>
+    <columns>NAME</columns>
+    <columns>Property__c</columns>
+    <columns>ShowingDate__c</columns>
+    <columns>Status__c</columns>
+    <columns>Contact__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Completed</value>
+    </filters>
+    <label>Completed Showings</label>
+</ListView>

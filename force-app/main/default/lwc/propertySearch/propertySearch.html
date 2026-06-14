@@ -1,0 +1,75 @@
+<template>
+    <lightning-card title="Property Search" icon-name="standard:home">
+        <!-- Search Filters Section -->
+        <div class="slds-p-around_medium">
+            <!-- First row of filters -->
+            <div class="slds-grid slds-gutters slds-wrap">
+                <!-- Status Filter -->
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-combobox
+                        label="Status"
+                        placeholder="Select a Status"
+                        value={status}
+                        options={statusOptions}
+                        onchange={handleStatusChange}
+                    >
+                    </lightning-combobox>
+                </div>
+
+                <!-- Bedrooms Filter -->
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input
+                        label="Bedrooms"
+                        type="number"
+                        placeholder="e.g. 3"
+                        onchange={handleBedroomsChange}
+                    >
+                    </lightning-input>
+                </div>
+
+                <!-- Min Price Filter -->
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input
+                        label="Min Price"
+                        type="number"
+                        placeholder="e.g. 100000"
+                        onchange={handleMinPriceChange}
+                    >
+                    </lightning-input>
+                </div>
+
+                <!-- Max Price Filter -->
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input
+                        label="Max Price"
+                        type="number"
+                        placeholder="e.g. 500000"
+                        onchange={handleMaxPriceChange}
+                    >
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <div class="slds-m-top_medium">
+                <lightning-button label="Search" variant="brand" onclick={handleSearch}> </lightning-button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <!-- template if:true only renders this section if properties has records -->
+        <template if:true={properties.length}>
+            <div class="slds-p-around_medium">
+                <lightning-datatable key-field="Id" data={properties} columns={columns}> </lightning-datatable>
+            </div>
+        </template>
+
+        <!-- Error Section -->
+        <!-- Only renders if there is an error -->
+        <template if:true={error}>
+            <div class="slds-p-around_medium">
+                <p style="color: red">An error occurred while searching. Please try again.</p>
+            </div>
+        </template>
+    </lightning-card>
+</template>

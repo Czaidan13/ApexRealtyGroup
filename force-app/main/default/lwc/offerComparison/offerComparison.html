@@ -1,0 +1,47 @@
+<template>
+    <lightning-card title="Offer Comparison" icon-name="standard:opportunity">
+        <!-- Show spinner while data is loading -->
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-align_absolute-center">
+                <lightning-spinner alternative-text="Loading" size="medium"> </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Show error if something went wrong -->
+        <template if:true={error}>
+            <div class="slds-p-around_medium">
+                <p style="color: red">An error occurred loading offers.</p>
+            </div>
+        </template>
+
+        <!-- Show message if no offers exist -->
+        <template if:true={noOffers}>
+            <div class="slds-p-around_medium">
+                <p>No offers found for this property.</p>
+            </div>
+        </template>
+
+        <!-- Show offers table if offers exist -->
+        <template if:true={hasOffers}>
+            <div class="slds-p-around_medium">
+                <!-- Accept button — only visible when a Pending offer is selected -->
+                <template if:true={showAcceptButton}>
+                    <div class="slds-m-bottom_medium">
+                        <lightning-button label="Accept Selected Offer" variant="brand" onclick={handleAccept}>
+                        </lightning-button>
+                    </div>
+                </template>
+
+                <!-- Single row selection datatable -->
+                <lightning-datatable
+                    key-field="Id"
+                    data={offers}
+                    columns={columns}
+                    max-row-selection="1"
+                    onrowselection={handleRowSelection}
+                >
+                </lightning-datatable>
+            </div>
+        </template>
+    </lightning-card>
+</template>
