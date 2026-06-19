@@ -1,6 +1,6 @@
 # Apex Realty Group
 
-A full Salesforce CRM implementation built for a fictional real estate agency — covering data modeling, automation, custom UI components, and enterprise security, all built from the ground up as a developer portfolio project.
+A full Salesforce CRM implementation built for a fictional real estate agency — covering data modeling, automation, custom UI components, security, reporting, and external API integration, all built from the ground up as a developer portfolio project.
 
 ## 🎥 Demo
 
@@ -34,9 +34,19 @@ Real estate was a deliberate choice. The business processes — listings moving 
 
 **Lightning Web Components**
 
-- **Property Search** — dynamic SOQL search with live picklist values, available right on the home page
-- **Agent Performance Dashboard** — real-time stats (active listings, total offers, commission YTD) calculated via Apex
-- **Offer Comparison Tool** — side-by-side offer review with single-click accept, wired into the existing automation
+- **Property Search** — dynamic SOQL search with live picklist values, available on the app home page
+- **Agent Performance Dashboard** — real-time stats (active listings, total offers, commission YTD) calculated via Apex aggregate queries
+- **Offer Comparison Tool** — side-by-side offer review with single-row selection and single-click accept, wired into the existing trigger automation
+- **Property Weather Widget** — displays daily forecast data (condition, low/high temperature range bar, humidity, wind, UV index) fetched from a live weather API
+
+**Weather Integration**
+
+- Named Credential + External Credential with Custom authentication protocol — API key never hardcoded or exposed in the codebase
+- WeatherCalloutService handles HTTP callouts and JSON parsing from WeatherAPI.com
+- WeatherQueueable fires asynchronously on Property creation to fetch initial weather data
+- WeatherBatchApex refreshes weather data daily across all Active listings
+- WeatherScheduler runs the batch automatically every morning at 8 AM
+- Full test coverage with mock HTTP callouts via HttpCalloutMock
 
 **Security & Access**
 
@@ -48,32 +58,41 @@ Real estate was a deliberate choice. The business processes — listings moving 
 **Reporting**
 
 - 6 custom reports covering listings, offers, commissions, and showings
-- Executive Dashboard with 6 components (bar, line, funnel, and donut charts)
+- Executive Dashboard with 6 components (horizontal bar, line, funnel, and donut charts)
 
 ## 🛠️ Tech Stack
 
-- Apex (triggers, handler classes, controllers, test classes)
-- Lightning Web Components (JavaScript, HTML, wire adapters)
+- Apex (triggers, handler classes, controllers, async Apex — Queueable, Batch, Scheduled)
+- Lightning Web Components (JavaScript, HTML, wire adapters, schema imports)
 - Flow Builder (scheduled and screen flows)
 - SOQL (including dynamic SOQL and aggregate queries)
-- Salesforce security model (roles, profiles, permission sets, sharing rules)
+- REST API integration (WeatherAPI.com via Named Credentials and External Credentials)
+- Salesforce security model (roles, profiles, permission sets, OWD, sharing rules)
 - Salesforce CLI + VS Code for local development
+- Git + GitHub for version control
 
 ## 🏗️ Architecture Highlights
 
-All triggers follow a thin trigger → handler class pattern, keeping logic testable and out of the trigger itself. The Offer and Property triggers work together to create a real business cascade: accepting an offer doesn't just update one record — it updates the property status, records the final sale price, withdraws other offers, and (when a property sells) generates a commission record for the agent automatically.
+All triggers follow a thin trigger → handler class pattern, keeping logic testable and out of the trigger itself. The Offer and Property triggers work together to create a real business cascade: accepting an offer doesn't just update one record — it updates the property status, records the final sale price, withdraws other offers, and when a property sells, generates a commission record for the agent automatically.
 
-On the UI side, the three custom LWCs aren't standalone demos — they're integrated into the actual user flow. The Property Search component lives on the home page where agents would start their day, the Agent Dashboard sits on the Agent record page, and the Offer Comparison tool is where the trigger automation actually gets triggered from the UI.
+The weather integration follows a store-and-display pattern rather than making live API calls on page load. A Queueable job fetches weather data when a property is created, and a Scheduled Batch job refreshes all Active listings daily. The LWC reads from stored fields — keeping page loads fast and the org resilient to API downtime. Authentication is handled entirely through Named Credentials and External Credentials, keeping the API key out of code and out of version control entirely.
+
+On the UI side, the four custom LWCs aren't standalone demos — they're integrated into the actual user flow. The Property Search component lives on the home page where agents start their day, the Agent Dashboard sits on the Agent record page, the Offer Comparison tool is where trigger automation gets initiated from the UI, and the Weather Widget enriches each property listing with live forecast data.
 
 ## 📚 What I Learned
 
-This project pushed me to think about Apex and automation the way a real org would need it — bulkified triggers, governor-limit-aware queries, and a handler pattern that keeps things maintainable. On the LWC side, working with `@wire`, imperative Apex calls, and reactive picklists gave me a much better feel for how the frontend and backend connect in Salesforce. It also reinforced how much the "admin" side — security, sharing, reports — shapes whether an org actually works for the people using it.
+Building the trigger automation taught me to think more carefully about how objects and records need to connect to each other. Watching an offer acceptance automatically cascade through the property status, sale price, and commission record made the value of well-designed automation click in a way that's hard to get from reading about it. That kind of flow between objects is what lets people actually work more efficiently in Salesforce — not just having the data, but having it move where it needs to go without anyone thinking about it.
+
+LWC was by far the steepest learning curve of the project — significantly harder than the Apex side. Getting comfortable with how JavaScript, wire adapters, and schema imports all work together, and understanding how data actually flows from Salesforce into a component.
+
+The weather integration was very satisfying to see come together. Setting up the Named Credential and External Credential authentication, building the async Apex architecture with Queueable and Batch jobs working in sync, and then seeing a clean organized widget displaying live forecast data on a property record made it all feel real. Realizing that all the backend pieces — the callout service, the scheduler, the batch — were properly working together was a good moment.
 
 ## 🚀 Future Enhancements
 
-- **Weather Integration (Phase 5 — in progress)**: Apex callouts to a weather API via Named Credentials, with async Apex (Queueable/Batch) to enrich property listings with local weather data
-- Additional automation around showing scheduling conflicts
-- Expanded reporting with historical trend analysis
+- **Multi-day forecast** — extend the weather widget to show a 3-day forecast using WeatherAPI's forecast endpoint
+- **Showing weather** — surface forecast conditions on upcoming Showing records so agents and buyers can prepare
+- **Additional automation** — showing scheduling conflict detection, automated follow-up sequences
+- **Expanded reporting** — historical trend analysis, agent performance over time
 
 ---
 
