@@ -1,0 +1,71 @@
+<template>
+    <lightning-card title="Current Weather" icon-name="standard:location">
+        <!-- Show placeholder if weather data hasn't been fetched yet -->
+        <template if:false={hasWeatherData}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <p class="slds-text-color_weak">Weather data not yet available for this property.</p>
+            </div>
+        </template>
+
+        <!-- Show weather widget when data is available -->
+        <template if:true={hasWeatherData}>
+            <div class="slds-p-around_medium">
+                <!-- Top section — weather icon and condition text centered -->
+                <div class="slds-text-align_center slds-m-bottom_medium">
+                    <!-- Weather icon fetched from WeatherAPI CDN — 64x64 per API spec -->
+                    <!-- CSP Trusted URL for cdn.weatherapi.com must be configured in Setup -->
+                    <img src={iconUrl} alt={condition} style="width: 64px; height: 64px" />
+                    <!-- Condition text below icon -->
+                    <p class="slds-text-heading_medium slds-text-color_weak slds-m-top_x-small">{condition}</p>
+                </div>
+
+                <!-- Temperature range bar — grey track with a blue-to-orange gradient fill -->
+                <!-- Fill width is driven by tempBarWidth; low temp anchors left, high temp anchors right -->
+                <div class="slds-m-bottom_x-small">
+                    <div style="background: #e0e0e0; border-radius: 4px; height: 8px; width: 100%; overflow: hidden">
+                        <!-- Gradient fill — width and style computed in tempBarStyle getter -->
+                        <div style={tempBarStyle}></div>
+                    </div>
+                    <!-- Low and high temperature labels flanking the bar -->
+                    <div class="slds-grid slds-m-top_xx-small">
+                        <div class="slds-col slds-text-align_left">
+                            <p class="slds-text-body_small slds-text-color_weak">Low {lowTempF}°F</p>
+                        </div>
+                        <div class="slds-col slds-text-align_right">
+                            <p class="slds-text-body_small slds-text-color_weak">High {highTempF}°F</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider between temperature range and secondary stats -->
+                <hr style="border-top: 1px solid #e0e0e0; margin: 0.75rem 0" />
+
+                <!-- Secondary stats row — three columns for humidity, wind, and UV index -->
+                <div class="slds-grid slds-gutters slds-m-top_medium">
+                    <!-- Humidity percentage -->
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                        <p class="slds-text-heading_small">{humidity}%</p>
+                        <p class="slds-text-body_small slds-text-color_weak">Humidity</p>
+                    </div>
+
+                    <!-- Wind speed in mph -->
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                        <p class="slds-text-heading_small">{windSpeed} mph</p>
+                        <p class="slds-text-body_small slds-text-color_weak">Wind</p>
+                    </div>
+
+                    <!-- UV Index -->
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                        <p class="slds-text-heading_small">{uvIndex}</p>
+                        <p class="slds-text-body_small slds-text-color_weak">UV Index</p>
+                    </div>
+                </div>
+
+                <!-- Last updated timestamp formatted as 6/19/2026 - 3:55 PM -->
+                <div class="slds-m-top_medium slds-text-align_center">
+                    <p class="slds-text-body_small slds-text-color_weak">Last updated: {formattedLastUpdated}</p>
+                </div>
+            </div>
+        </template>
+    </lightning-card>
+</template>

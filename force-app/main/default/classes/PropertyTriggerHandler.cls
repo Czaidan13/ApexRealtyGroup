@@ -1,4 +1,15 @@
 public with sharing class PropertyTriggerHandler {
+    public static void handleAfterInsert(List<Property__c> newProps) {
+        // Enqueue a Queueable job for each newly created Property
+        // The Queueable job makes an async callout to fetch weather data
+        // Cannot make callouts directly in a trigger — Queueable runs in a separate transaction
+        for (Property__c prop : newProps) {
+            if (prop.Address__c != null) {
+                System.enqueueJob(new WeatherQueueable(prop.Id));
+            }
+        }
+    }
+
     public static void handleAfterUpdate(List<Property__c> newProps, Map<Id, Property__c> oldMap) {
         // Step 1 - Collect unique Agent Ids from all Properties being updated
         // Using a Set ensures no duplicate Ids even if multiple Properties share the same Agent
